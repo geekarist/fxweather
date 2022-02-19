@@ -2,7 +2,7 @@
   (:gen-class
    :extends javafx.application.Application)
   (:import
-   (javafx.application Application)
+   (javafx.application Application Platform)
    (javafx.fxml FXMLLoader)
    (javafx.scene #_Parent Scene)
    #_(javafx.stage Stage))
@@ -21,6 +21,8 @@
     scene))
 
 (defn -start [_this primaryStage]
+  #_{:clj-kondo/ignore [:inline-def]}
+  (def MAIN_STAGE primaryStage)
   (try
     (.setScene primaryStage (create-scene!))
     (.show primaryStage)
@@ -29,7 +31,17 @@
       (do (.printStackTrace e)
           (throw e)))))
 
+(defn reload-ui! []
+  (Platform/runLater
+   #(try (.hide MAIN_STAGE)
+         (.setScene MAIN_STAGE (create-scene!))
+         (.show MAIN_STAGE)
+         (catch Exception e
+           (do (.printStackTrace e)
+               (throw e))))))
+
 (comment
   (comment -start)
-  (-main)
+  (future (-main))
+  (future (reload-ui!))
   )
