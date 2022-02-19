@@ -4,8 +4,8 @@
   (:import
    (javafx.application Application)
    (javafx.fxml FXMLLoader)
-   (javafx.scene Parent Scene)
-   (javafx.stage Stage))
+   (javafx.scene #_Parent Scene)
+   #_(javafx.stage Stage))
   (:require [clojure.java.io :as io]))
 
 (defn -main []
@@ -14,15 +14,22 @@
          (do (.printStackTrace e)
              (throw e)))))
 
+(defn- create-scene! []
+  (let [loc (io/resource "ui.fxml")
+        root (FXMLLoader/load ^java.net.URL loc)
+        scene (Scene. root)]
+    scene))
+
 (defn -start [_this primaryStage]
-  (try (let [loc (io/resource "ui.fxml")
-             root (FXMLLoader/load ^java.net.URL loc)
-             scene (Scene. root 300 250)]
-         (.setScene primaryStage scene)
-         (.show primaryStage))
-       (catch Exception e
-         (do (.printStackTrace e)
-             (throw e)))))
+  (try
+    (.setScene primaryStage (create-scene!))
+    (.show primaryStage)
+
+    (catch Exception e
+      (do (.printStackTrace e)
+          (throw e)))))
 
 (comment
-  (-main))
+  (comment -start)
+  (-main)
+  )
